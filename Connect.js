@@ -20,7 +20,8 @@ let opts = {
 }
 
 // These are the commands the bot knows (defined below):
-let knownCommands = { echo, haiku, doom, givepts, slap, coinflip, gamble, purge, songrequest, skipsong} //add new commands to this list
+let knownCommands = { echo, haiku, doom, givepts, slap, coinflip, gamble, purge, songrequest, skipsong, commands} //add new commands to this list
+
 // Create a client with our options:
 let client = new tmi.client(opts)
 
@@ -226,4 +227,12 @@ function skipsong(target, context) //If going to combine services requested, nee
     console.log("Not implemented yet, but detected");
     var song = songQueue.shift();
     client.say(target, song.song+" skipped because you have terrible taste in music and your parents avoid your calls")
+}
+
+function commands(target, context)
+{
+    var cmdStrings = [];
+    for(var commandName in knownCommands)
+        cmdStrings[cmdStrings.length] = " !" + commandName.toString() + " ";
+    client.say(target, "Commands known:" + cmdStrings)
 }
