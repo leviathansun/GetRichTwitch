@@ -2,7 +2,9 @@ const tmi = require('tmi.js');
 const haikudos = require('haikudos');
 
 //channel variables
-var currUsers = [ 'MirandaCosgroveBot' ];
+let currUsers = [ 'MirandaCosgroveBot' ];
+
+let songQueue = {};
 
 // Valid commands start with:
 let commandPrefix = '!';
@@ -18,7 +20,7 @@ let opts = {
 }
 
 // These are the commands the bot knows (defined below):
-let knownCommands = { echo, haiku, doom, givepts, slap, coinflip, gamble } //add new commands to this list
+let knownCommands = { echo, haiku, doom, givepts, slap, coinflip, gamble, purge, songrequest, skipsong} //add new commands to this list
 // Create a client with our options:
 let client = new tmi.client(opts)
 
@@ -198,3 +200,29 @@ function sendMessage (target, context, message) {
     }
 }
 
+//Bans and then unbans user to purge their messages from chat
+function purge(target, context, purgedUser)
+{
+	if(purgedUser.length)
+		var byebye = purgedUser.join(' ');
+
+	client.say(target, purgedUser + " has had their chat removed due to profamity");
+}
+
+//Adds new song to the back of the queue
+function songrequest(target, context, songURL) //This is for youtube links, possibly need detection for which service is being requested
+{
+    if(songURL === "" || songURL === " ")
+        return
+
+    client.push("songs", {URL: songURL, user: context})
+    console.log("Not implemented yet, but detected")
+}
+
+//Skips current song in the queue/playing
+function skipsong(target, context) //If going to combine services requested, need queue possibly handled through
+{                                  // JSON file to keep track of song and service requested
+    console.log("Not implemented yet, but detected")
+    client.pop();
+    client.say(target, "Song skipped because you have terrible taste in music and your parents avoid your calls")
+}
