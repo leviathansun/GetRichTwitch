@@ -4,8 +4,8 @@ const haikudos = require('haikudos');
 //channel variables
 let currUsers = [ 'MirandaCosgroveBot' ];
 
-let songQueue = {};
-
+let songQueue = [];
+let requestTracker = [];
 // Valid commands start with:
 let commandPrefix = '!';
 // Define configuration options:
@@ -205,7 +205,8 @@ function purge(target, context, purgedUser)
 {
 	if(purgedUser.length)
 		var byebye = purgedUser.join(' ');
-
+    client.say(target, "/ban " + purgedUser);
+    client.say(target, "/unban " + purgedUser);
 	client.say(target, purgedUser + " has had their chat removed due to profamity");
 }
 
@@ -214,15 +215,15 @@ function songrequest(target, context, songURL) //This is for youtube links, poss
 {
     if(songURL === "" || songURL === " ")
         return
-
-    client.push("songs", {URL: songURL, user: context})
+    songQueue.push({reqUser: context, song: songURL});
+    console.log(songQueue);
     console.log("Not implemented yet, but detected")
 }
 
 //Skips current song in the queue/playing
 function skipsong(target, context) //If going to combine services requested, need queue possibly handled through
 {                                  // JSON file to keep track of song and service requested
-    console.log("Not implemented yet, but detected")
-    client.pop();
-    client.say(target, "Song skipped because you have terrible taste in music and your parents avoid your calls")
+    console.log("Not implemented yet, but detected");
+    var song = songQueue.shift();
+    client.say(target, song.song+" skipped because you have terrible taste in music and your parents avoid your calls")
 }
