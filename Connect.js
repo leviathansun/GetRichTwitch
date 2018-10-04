@@ -206,7 +206,6 @@ function sendMessage (target, context, message) {
 //Bans and then unbans user to purge their messages from chat
 function purge(target, context, purgedUser)
 {
-<<<<<<< HEAD
 	if(purgedUser.length)
 		var byebye = purgedUser.join(' ');
     client.say(target, "/ban " + purgedUser);
@@ -223,7 +222,6 @@ function clear(target, context)
 {
 	client.say(target, "/clear")
 	client.say(target, "BEGONE THOTS")
->>>>>>> master
 }
 
 function commands(target, context)
