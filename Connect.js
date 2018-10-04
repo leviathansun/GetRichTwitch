@@ -18,11 +18,8 @@ let opts = {
 }
 
 // These are the commands the bot knows (defined below):
-<<<<<<< HEAD
-let knownCommands = { echo, haiku, doom, givepts, slap, coinflip, gamble, purge, commands} //add new commands to this list
-=======
-let knownCommands = { echo, haiku, doom, givepts, slap, coinflip, gamble, purge, commands, clear} //add new commands to this list
->>>>>>> master
+let knownCommands = { echo, haiku, doom, givepts, slap, coinflip, gamble, purge, commands, clear, songrequest, skipsong} //add new commands to this list
+
 
 // Create a client with our options:
 let client = new tmi.client(opts)
@@ -207,12 +204,6 @@ function sendMessage (target, context, message) {
 function purge(target, context, purgedUser)
 {
 	if(purgedUser.length)
-		var byebye = purgedUser.join(' ');
-    client.say(target, "/ban " + purgedUser);
-    client.say(target, "/unban " + purgedUser);
-	client.say(target, purgedUser + " has had their chat removed due to profamity");
-=======
-    if(purgedUser.length)
         var byebye = purgedUser.join(' ');
     client.say(target, "/timeout " + purgedUser + " 1");
     client.say(target, purgedUser + " has had their chat removed due to profamity");
@@ -230,4 +221,22 @@ function commands(target, context)
     for(var commandName in knownCommands)
         cmdStrings[cmdStrings.length] = " !" + commandName.toString() + " ";
     client.say(target, "Commands known:" + cmdStrings)
+}
+
+//Adds new song to the back of the queue
+function songrequest(target, context, songURL) //This is for youtube links, possibly need detection for which service is being requested
+{
+    if(songURL === "" || songURL === " ")
+        return
+    songQueue.push({reqUser: context, song: songURL});
+    console.log(songQueue);
+    console.log("Not implemented yet, but detected")
+}
+
+//Skips current song in the queue/playing
+function skipsong(target, context) //If going to combine services requested, need queue possibly handled through
+{                                  // JSON file to keep track of song and service requested
+    console.log("Not implemented yet, but detected");
+    var song = songQueue.shift();
+    client.say(target, song.song+" skipped because you have terrible taste in music and your parents avoid your calls")
 }
