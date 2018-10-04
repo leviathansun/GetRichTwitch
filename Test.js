@@ -4,6 +4,8 @@ const haikudos = require('haikudos');
 //channel variables
 let currUsers = [ 'MirandaCosgroveBot' ];
 
+let songQueue = [];
+let requestTracker = [];
 // Valid commands start with:
 let commandPrefix = '!';
 // Define configuration options:
@@ -18,7 +20,7 @@ let opts = {
 }
 
 // These are the commands the bot knows (defined below):
-let knownCommands = { echo, haiku, doom, givepts, slap, coinflip, gamble, purge, commands} //add new commands to this list
+let knownCommands = { echo, haiku, doom, givepts, slap, coinflip, gamble, purge, songrequest, skipsong, commands} //add new commands to this list
 
 // Create a client with our options:
 let client = new tmi.client(opts)
@@ -88,85 +90,85 @@ function echo (target, context, params) {
 // Function called when the "haiku" command is issued:
 // Function created by
 function haiku (target, context) {
-	// Generate a new haiku:
-	haikudos((newHaiku) => {
-		// Split it line-by-line:
-		newHaiku.split('\n').forEach((h) => {
-			// Send each line separately:
-			sendMessage(target, context, h)
-		})
-	})
+    // Generate a new haiku:
+    haikudos((newHaiku) => {
+        // Split it line-by-line:
+        newHaiku.split('\n').forEach((h) => {
+            // Send each line separately:
+            sendMessage(target, context, h)
+        })
+    })
 }
-	
+
 // Function called when the "gamble" command is issued:
-// Function created by 
+// Function created by
 function gamble(target, context, params) {
-	var coin = Math.floor(Math.random() * 2);
+    var coin = Math.floor(Math.random() * 2);
 
-	//takes in bet input
-	if (params.length)
-		var msg = params.join(' ');
+    //takes in bet input
+    if (params.length)
+        var msg = params.join(' ');
 
-	if (coin == 0)
-		coin = 'tails';
-	else
-		coin = 'heads';
+    if (coin == 0)
+        coin = 'tails';
+    else
+        coin = 'heads';
 
-	// Prints gamble messages;
-	if (coin == 'tails' && coin == msg)
-		sendMessage(target, context, 'You bet on Tails and you won the bet (somehow). You won 50 coins');
-	else if (coin == 'heads' && coin == msg)
-		sendMessage(target, context, 'You bet on Heads and you won the bet (somehow). You won 50 coins');
-	else if (coin == 'tails' && !(coin == msg))
-		sendMessage(target, context, 'You bet on Heads and you lost the bet. You lost 100 coins..boohoo');
-	else if (coin == 'heads' && !(coin == msg))
-		sendMessage(target, context, 'You bet on Tails and you lost the bet. You lost 100 coins..boohoo');
+    // Prints gamble messages;
+    if (coin == 'tails' && coin == msg)
+        sendMessage(target, context, 'You bet on Tails and you won the bet (somehow). You won 50 coins');
+    else if (coin == 'heads' && coin == msg)
+        sendMessage(target, context, 'You bet on Heads and you won the bet (somehow). You won 50 coins');
+    else if (coin == 'tails' && !(coin == msg))
+        sendMessage(target, context, 'You bet on Heads and you lost the bet. You lost 100 coins..boohoo');
+    else if (coin == 'heads' && !(coin == msg))
+        sendMessage(target, context, 'You bet on Tails and you lost the bet. You lost 100 coins..boohoo');
 }
 
 // Function called when the "coinflip" command is issued:
 // Function created by lts25
 function coinflip(target, context) {
-	var coin = Math.floor(Math.random() * 2);
+    var coin = Math.floor(Math.random() * 2);
 
-	// Print coin;
-	if (coin == 0)
-		sendMessage(target, context, 'The coin landed on Tails');
-	else if (coin == 1)
-		sendMessage(target, context, 'The coin landed on Heads');
+    // Print coin;
+    if (coin == 0)
+        sendMessage(target, context, 'The coin landed on Tails');
+    else if (coin == 1)
+        sendMessage(target, context, 'The coin landed on Heads');
 }
-	
+
 // Function called when the "slap" command is issued:
 // Function created by lts25
 function slap(target, context, slapee) {
-	var inChat = 1;
-	var i;
-	
-	currUsers.push(context.username);
-	//console.log(currUsers);
-	
-	if (slapee != "") {
-		inChat = 0
-		for (i = 0; i < currUsers.length; i++){
-			if (currUsers[i] == slapee) {
-				inChat = 1;
-				break;
-			}
-		}
-		if (inChat){
-		client.say(target, "@" + slapee + ", YOU HAVE BEEN SLAPPED!");
-		}
-		else {
-			client.say(target, "user not in slapable.");
-		}
-	}
-	else {
-		var numPersons = currUsers.length;
-		var person = Math.floor(Math.random() * numPersons);
-	
-		var slapee = currUsers[person];
-		client.say(target, "@" + slapee + ", YOU HAVE BEEN SLAPPED!");
-	}
-	
+    var inChat = 1;
+    var i;
+
+    currUsers.push(context.username);
+    //console.log(currUsers);
+
+    if (slapee != "") {
+        inChat = 0
+        for (i = 0; i < currUsers.length; i++){
+            if (currUsers[i] == slapee) {
+                inChat = 1;
+                break;
+            }
+        }
+        if (inChat){
+            client.say(target, "@" + slapee + ", YOU HAVE BEEN SLAPPED!");
+        }
+        else {
+            client.say(target, "user not in slapable.");
+        }
+    }
+    else {
+        var numPersons = currUsers.length;
+        var person = Math.floor(Math.random() * numPersons);
+
+        var slapee = currUsers[person];
+        client.say(target, "@" + slapee + ", YOU HAVE BEEN SLAPPED!");
+    }
+
 }
 
 //Function called when the "doom" command is issued:
@@ -176,7 +178,7 @@ function doom(target, context, params) {
 
     if(params.length)
         var msg = params.join(' ');
-    
+
     //Prints return message
     sendMessage(target, context, 'Yes, Doom will run on anything, even on a ' + msg );
 }
@@ -191,9 +193,9 @@ function givepts(target, context) {
 
 // Helper function to send the correct type of message:
 // Know that Commands do not run in Whisper
-function sendMessage (target, context, message) { 
+function sendMessage (target, context, message) {
     if (context['message-type'] === 'whisper') {
-       client.whisper(target, message)
+        client.whisper(target, message)
     } else {
         client.say(target, message)
     }
@@ -202,11 +204,29 @@ function sendMessage (target, context, message) {
 //Bans and then unbans user to purge their messages from chat
 function purge(target, context, purgedUser)
 {
-	if(purgedUser.length)
-		var byebye = purgedUser.join(' ');
+    if(purgedUser.length)
+        var byebye = purgedUser.join(' ');
     client.say(target, "/ban " + purgedUser);
     client.say(target, "/unban " + purgedUser);
-	client.say(target, purgedUser + " has had their chat removed due to profamity");
+    client.say(target, purgedUser + " has had their chat removed due to profamity");
+}
+
+//Adds new song to the back of the queue
+function songrequest(target, context, songURL) //This is for youtube links, possibly need detection for which service is being requested
+{
+    if(songURL === "" || songURL === " ")
+        return
+    songQueue.push({reqUser: context, song: songURL});
+    console.log(songQueue);
+    console.log("Not implemented yet, but detected")
+}
+
+//Skips current song in the queue/playing
+function skipsong(target, context) //If going to combine services requested, need queue possibly handled through
+{                                  // JSON file to keep track of song and service requested
+    console.log("Not implemented yet, but detected");
+    var song = songQueue.shift();
+    client.say(target, song.song+" skipped because you have terrible taste in music and your parents avoid your calls")
 }
 
 function commands(target, context)
