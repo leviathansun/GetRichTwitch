@@ -1,9 +1,15 @@
 const tmi = require('tmi.js');
 const haikudos = require('haikudos');
+const getVideoId = require('get-video-id');
+const youtube = require('youtube-iframe-player');
+const http = require('http');
+const fs = require('fs');
+const hostname = 'localhost';
+const port = 5000;
 
 //channel variables
 let currUsers = [ 'MirandaCosgroveBot' ];
-let songQueue = []
+
 // Valid commands start with:
 let commandPrefix = '!';
 // Define configuration options:
@@ -18,8 +24,7 @@ let opts = {
 }
 
 // These are the commands the bot knows (defined below):
-let knownCommands = { echo, haiku, doom, givepts, slap, coinflip, gamble, purge, commands, clear, songrequest, skipsong} //add new commands to this list
-
+let knownCommands = { echo, haiku, doom, givepts, slap, coinflip, hug, gamble, purge, commands, clear, playvideo} //add new commands to this list
 
 // Create a client with our options:
 let client = new tmi.client(opts)
@@ -97,6 +102,38 @@ function haiku (target, context) {
             sendMessage(target, context, h)
         })
     })
+}
+
+// Function called when the "hug" command is issued:
+function hug(target, context, huggee) {
+    var inChat = 1;
+    var i;
+
+    currUsers.push(context.username);
+    //console.log(currUsers);
+
+    if (huggee != "") {
+        inChat = 0
+        for (i = 0; i < currUsers.length; i++){
+            if (currUsers[i] == huggee) {
+                inChat = 1;
+                break;
+            }
+        }
+        if (inChat){
+            client.say(target, "@" + huggee + ", Awe, you have been hugged:)");
+        }
+        else {
+            client.say(target, "user not huggable.");
+        }
+    }
+    else {
+        var numPersons = currUsers.length;
+        var person = Math.floor(Math.random() * numPersons);
+
+        var huggee = currUsers[person];
+        client.say(target, "@" + huggee + ", Awe, you have been hugged:)");
+    }
 }
 
 // Function called when the "gamble" command is issued:
@@ -203,16 +240,28 @@ function sendMessage (target, context, message) {
 //Bans and then unbans user to purge their messages from chat
 function purge(target, context, purgedUser)
 {
-	if(purgedUser.length)
-        var byebye = purgedUser.join(' ');
-    client.say(target, "/timeout " + purgedUser + " 1");
-    client.say(target, purgedUser + " has had their chat removed due to profamity");
+    if(context['mod'] === true) {
+        if (purgedUser.length)
+            var byebye = purgedUser.join(' ');
+        client.say(target, "/timeout " + purgedUser + " 1");
+        client.say(target, "Not just the " + purgedUser + " but the women and children too...");
+    }
+    else if(context['mod'] === false)
+    {
+        client.say(target, context['display-name'] + " your magic holds no power here.")
+    }
+
+    if(context['user-id'] === '194986251')
+    {
+        console.log("What did the Leprechaun say to the bald guy?");
+        console.log("Ah damn Griff's here shut up");
+    }
 }
 
 function clear(target, context)
 {
 	client.say(target, "/clear")
-	client.say(target, "BEGONE THOTS")
+	client.say(target, "Alright ya'll gettin' a little too nasty.")
 }
 
 function commands(target, context)
@@ -223,20 +272,22 @@ function commands(target, context)
     client.say(target, "Commands known:" + cmdStrings)
 }
 
-//Adds new song to the back of the queue
-function songrequest(target, context, songURL) //This is for youtube links, possibly need detection for which service is being requested
-{
-    if(songURL === "" || songURL === " ")
-        return
-    songQueue.push({reqUser: context, song: songURL});
-    console.log(songQueue);
-    console.log("Not implemented yet, but detected")
+function playvideo(target, context, videoID) {
+    let server;
+    let ID = getVideoId(videoID.toString());
+    console.log(ID);
+    module.exports = {vidID : ID};
+    fs.readFile('./Documents/GitHub/GetRichTwitch/vidplay.html', function (err, html) {
+        if (err) {
+            throw err;
+        }
+            server = http.createServer(function(request, response) {
+            response.writeHeader(200, {"Content-Type": "text/html"});
+            response.write(html);
+            response.end();
+        }).listen(port, hostname, () => {
+            console.log(`Server running at http://${hostname}:${port}/`);
+        });
+    });
 }
 
-//Skips current song in the queue/playing
-function skipsong(target, context) //If going to combine services requested, need queue possibly handled through
-{                                  // JSON file to keep track of song and service requested
-    console.log("Not implemented yet, but detected");
-    var song = songQueue.shift();
-    client.say(target, song.song+" skipped because you have terrible taste in music and your parents avoid your calls")
-}
