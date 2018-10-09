@@ -3,7 +3,7 @@ const haikudos = require('haikudos');
 
 //channel variables
 let currUsers = [ 'MirandaCosgroveBot' ];
-
+let songQueue = []
 // Valid commands start with:
 let commandPrefix = '!';
 // Define configuration options:
